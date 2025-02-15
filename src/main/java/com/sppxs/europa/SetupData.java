@@ -65,6 +65,26 @@ public class SetupData implements CommandLineRunner {
             purchaseOrderRepository.saveAll(pos);
             System.out.println(">>>> Loaded Orders");
         }
+
+        //Create 2 Purchase Orders
+        Set<PurchaseOrder> pos = new HashSet<>();
+        for (int i = 0; i < 5; i++) {
+            pos.add(createPurchaseOrder());
+        }
+        purchaseOrderRepository.saveAll(pos);
+    }
+
+    private PurchaseOrder createPurchaseOrder() {
+        PurchaseOrder purchaseOrder = new PurchaseOrder();
+        purchaseOrder.setGuid(UUID.randomUUID().toString());
+        PurchaseOrderItem i1 = new PurchaseOrderItem();
+        //Get a random item from the item repository
+        i1.setItem(itemRepository.findById(new Random().nextInt(9) + 1L).get());
+        //Set a random quantity
+        i1.setQuantity(new Random().nextInt(9) + 1);
+        purchaseOrder.addOrderItem(i1);
+        //purchaseOrderRepository.save(purchaseOrder);
+        return purchaseOrder;
     }
 
 }
