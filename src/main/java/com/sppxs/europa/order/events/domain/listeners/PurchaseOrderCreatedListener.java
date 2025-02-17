@@ -1,7 +1,6 @@
-package com.sppxs.europa.events.domain.listeners;
+package com.sppxs.europa.order.events.domain.listeners;
 
-import com.sppxs.europa.events.domain.PurchaseOrderCreatedEvent;
-import org.springframework.context.event.EventListener;
+import com.sppxs.europa.order.events.domain.PurchaseOrderCreatedEvent;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;

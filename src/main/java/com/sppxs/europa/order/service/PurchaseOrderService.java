@@ -1,8 +1,8 @@
-package com.sppxs.europa.service;
+package com.sppxs.europa.order.service;
 
-import com.sppxs.europa.entity.PurchaseOrder;
-import com.sppxs.europa.entity.PurchaseOrderItem;
-import com.sppxs.europa.repository.PurchaseOrderRepository;
+import com.sppxs.europa.order.entity.PurchaseOrder;
+import com.sppxs.europa.order.entity.PurchaseOrderItem;
+import com.sppxs.europa.order.repository.PurchaseOrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

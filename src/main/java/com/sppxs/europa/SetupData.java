@@ -1,10 +1,10 @@
 package com.sppxs.europa;
 
-import com.sppxs.europa.entity.Item;
-import com.sppxs.europa.entity.PurchaseOrder;
-import com.sppxs.europa.entity.PurchaseOrderItem;
-import com.sppxs.europa.repository.ItemRepository;
-import com.sppxs.europa.repository.PurchaseOrderRepository;
+import com.sppxs.europa.order.entity.Item;
+import com.sppxs.europa.order.entity.PurchaseOrder;
+import com.sppxs.europa.order.entity.PurchaseOrderItem;
+import com.sppxs.europa.order.repository.ItemRepository;
+import com.sppxs.europa.order.repository.PurchaseOrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

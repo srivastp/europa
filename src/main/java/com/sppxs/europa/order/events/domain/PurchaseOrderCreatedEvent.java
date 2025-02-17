@@ -1,4 +1,4 @@
-package com.sppxs.europa.events.domain;
+package com.sppxs.europa.order.events.domain;
 
 //@Getter
 //@AllArgsConstructor

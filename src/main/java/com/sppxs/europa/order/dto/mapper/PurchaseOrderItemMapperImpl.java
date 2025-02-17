@@ -1,7 +1,7 @@
-package com.sppxs.europa.dto.mapper;
+package com.sppxs.europa.order.dto.mapper;
 
-import com.sppxs.europa.dto.PurchaseOrderItemDto;
-import com.sppxs.europa.entity.PurchaseOrderItem;
+import com.sppxs.europa.order.dto.PurchaseOrderItemDto;
+import com.sppxs.europa.order.entity.PurchaseOrderItem;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.processing.Generated;

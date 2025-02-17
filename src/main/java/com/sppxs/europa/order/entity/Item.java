@@ -1,4 +1,4 @@
-package com.sppxs.europa.entity;
+package com.sppxs.europa.order.entity;
 
 import jakarta.persistence.*;
 

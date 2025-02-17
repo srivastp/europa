@@ -1,6 +1,6 @@
-package com.sppxs.europa.entity;
+package com.sppxs.europa.order.entity;
 
-import com.sppxs.europa.events.domain.PurchaseOrderCreatedEvent;
+import com.sppxs.europa.order.events.domain.PurchaseOrderCreatedEvent;
 import jakarta.persistence.*;
 import org.springframework.data.domain.AfterDomainEventPublication;
 import org.springframework.data.domain.DomainEvents;
