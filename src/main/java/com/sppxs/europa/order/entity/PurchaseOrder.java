@@ -21,6 +21,8 @@ public class PurchaseOrder implements Serializable {
     private List<PurchaseOrderItem> purchaseOrderItems = new ArrayList<>();
     private double amount;
 
+    private String username;
+    private String status;
 
     //@Transient
     //private final List<Object> purchaseOrderDomainEvents = new ArrayList<>();
@@ -65,6 +67,22 @@ public class PurchaseOrder implements Serializable {
 
     public void setPurchaseOrderItems(List<PurchaseOrderItem> purchaseOrderItems) {
         this.purchaseOrderItems = purchaseOrderItems;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public void addOrderItem(PurchaseOrderItem purchaseOrderItem) {
