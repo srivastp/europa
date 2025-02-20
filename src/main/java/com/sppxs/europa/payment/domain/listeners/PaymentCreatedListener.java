@@ -1,12 +1,15 @@
 package com.sppxs.europa.payment.domain.listeners;
 
 import com.sppxs.europa.payment.domain.PaymentCreatedEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 public class PaymentCreatedListener {
+    private static final Logger logger = LoggerFactory.getLogger(PaymentCreatedListener.class);
 
     //@EventListener // -- method will get executed even if the save/update operation was rolled back
     @TransactionalEventListener(classes = PaymentCreatedEvent.class) // -- will execute only if the transaction is committed
@@ -57,6 +60,16 @@ public class PaymentCreatedListener {
             public AmazonSQSAsync amazonSQS() {
                 return AmazonSQSAsyncClientBuilder.defaultClient();
             }
+        }
+
+        @Retryable(
+            value = {MessagingException.class},
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 1000, multiplier = 2)
+        )
+        @CircuitBreaker(name = "payment-notification")
+        public void sendNotification(PaymentCreatedEvent event) {
+            // Implementation
         }
          */
 

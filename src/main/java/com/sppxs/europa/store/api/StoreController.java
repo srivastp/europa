@@ -17,5 +17,14 @@ public class StoreController {
     public ResponseEntity<Long> createOrder() {
         Long poId = storeService.createOrder();
         return ResponseEntity.created(null).body(poId);
+        //ToDo
+        /*
+        return ResponseEntity.created(
++            ServletUriComponentsBuilder.fromCurrentRequest()
++                .path("/{id}")
++                .buildAndExpand(poId)
++                .toUri())
++            .body(poId);
+         */
     }
 }

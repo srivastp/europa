@@ -1,14 +1,17 @@
 package com.sppxs.europa.payment.entity.dto;
 
-import lombok.*;
-
 /*@Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)*/
 public class PaymentRequest {
+    //@NotNull(message = "Purchase order ID is required")
+    //@NotBlank(message = "Purchase order ID cannot be blank")
     private String purchaseOrderId;
+
+    //@NotNull(message = "Transaction ID is required")
+    //@NotBlank(message = "Transaction ID cannot be blank")
     private String transactionId;
 
     public PaymentRequest() {

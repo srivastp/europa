@@ -98,6 +98,12 @@ public class Payment implements Serializable {
     }
 
     public void addTransaction(Transaction transaction) {
+        if (transaction == null) {
+            throw new IllegalArgumentException("Transaction cannot be null");
+        }
+        if (transaction.getAmount() < 0) {
+            throw new IllegalArgumentException("Transaction amount cannot be negative");
+        }
         transactions.add(transaction);
         transaction.setPayment(this);
         amount += transaction.getAmount();
@@ -119,5 +125,9 @@ public class Payment implements Serializable {
         for (Object transaction : transactions) {
             removeTransaction((Transaction) transaction);
         }
+    }
+
+    public enum PaymentStatus {
+        SUCCESS, DECLINED, PENDING
     }
 }

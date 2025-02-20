@@ -6,6 +6,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class PaymentProcessorService {
+
+    //@Value("${payment.processor.timeout:8000}")
+    //private long processingTimeout;
+    //@Value("${payment.processor.success-threshold:3}")
+    //private int successThreshold;
+
     public PaymentResponse processPayment(PaymentRequest paymentRequest) {
         try {
             System.out.println("Thread_Id: " + Thread.currentThread().threadId() +
@@ -13,6 +19,7 @@ public class PaymentProcessorService {
                     " | Transaction ID: " + paymentRequest.getTransactionId());
             Thread.sleep(8_000);
         } catch (InterruptedException e) {
+            //Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }
 

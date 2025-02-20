@@ -28,7 +28,7 @@ public class StoreService {
     public Long createOrder() {
         PurchaseOrder po = createPurchaseOrder();
 
-        CompletableFuture.runAsync(() -> {
+        CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
             Payment payment = paymentService.createPayment(po);
             System.out.println("Payment created with id: " + payment.getId());
             if (payment.getStatus().equals("Declined")) {
@@ -41,7 +41,13 @@ public class StoreService {
             purchaseOrderRepository.save(po);
             System.out.println("Thread_Id: " + Thread.currentThread().threadId() +
                     " | Order status updated to: " + po.getStatus());
+        }).exceptionally(throwable -> {
+            po.setStatus("Failed");
+            purchaseOrderRepository.save(po);
+            System.err.println("Payment processing failed: " + throwable.getMessage());
+            return null;
         });
+        ;
 
         System.out.println("%%%% Order created with id: " + po.getId());
         return po.getId();
@@ -62,7 +68,9 @@ public class StoreService {
         for (int j = 0; j < itemsSize; j++) {
             PurchaseOrderItem i = new PurchaseOrderItem();
             //Get a random item from the item repository
-            i.setItem(itemRepository.findById(new Random().nextInt(5) + 1L).get());
+            Long itemId = new Random().nextInt(5) + 1L;
+            i.setItem(itemRepository.findById(itemId)
+                    .orElseThrow(() -> new IllegalStateException("Item not found: " + itemId)));
             //Set a random quantity
             i.setQuantity(new Random().nextInt(5) + 1);
             purchaseOrder.addOrderItem(i);

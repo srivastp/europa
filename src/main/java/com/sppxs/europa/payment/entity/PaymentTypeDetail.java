@@ -9,9 +9,16 @@ public class PaymentTypeDetail {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
+
+    //ToDO @Convert(converter = EncryptedStringConverter.class)
+    //@Column(name = "card_number", length = 255)
     private String cardNumber;
     private String cardHolderName;
+
+    //@Column(name = "expiry_date", length = 7)
+    //@Pattern(regexp = "^(0[1-9]|1[0-2])/([0-9]{2})$")
     private String expiryDate;
+    @Transient // Do not store CVV
     private String cvv;
     private String cardType;
     private String accountNumber;

@@ -26,6 +26,21 @@ public class PurchaseOrder implements Serializable {
     private String username;
     private String status;
 
+    /*
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @LastModifiedDate
+    @Column(nullable = false)
+    private Instant updatedAt;
+    */
+
+    public enum OrderStatus {
+        CREATED, DECLINED, READY_TO_SHIP, PENDING
+    }
+
+
     //@Transient
     //private final List<Object> purchaseOrderDomainEvents = new ArrayList<>();
 

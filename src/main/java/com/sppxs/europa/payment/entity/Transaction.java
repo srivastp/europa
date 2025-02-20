@@ -1,8 +1,11 @@
 package com.sppxs.europa.payment.entity;
 
 import jakarta.persistence.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.io.Serializable;
+import java.time.Instant;
 
 @Entity
 @Table(name = "transaction")
@@ -18,9 +21,22 @@ public class Transaction implements Serializable {
     @ManyToOne
     @JoinColumn(name = "payment_type_detail_id")
     private PaymentTypeDetail paymentTypeDetail;
+    //@Enumerated(EnumType.STRING)
+    @Column(name = "type", length = 20, nullable = false)
     private String type;
+    @Column(name = "amount", nullable = false)
     private double amount;
     private String status;
+
+/*
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @LastModifiedDate
+    @Column(nullable = false)
+    private Instant updatedAt;
+*/
 
     public Long getId() {
         return id;

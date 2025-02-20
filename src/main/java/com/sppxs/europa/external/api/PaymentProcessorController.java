@@ -12,10 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 @RestController
 @RequestMapping("/apis/visa")
@@ -25,23 +22,41 @@ public class PaymentProcessorController {
 
     @PostMapping
     public List<PaymentResponse> processPayment(@RequestBody List<PaymentRequest> paymentRequests) throws ExecutionException, InterruptedException {
-        //use Autocloseable to close the executor service
-        ExecutorService executorService = Executors.newFixedThreadPool(10);
-        List<Future<PaymentResponse>> futures = new ArrayList<>();
+        try (ExecutorService executorService = Executors.newFixedThreadPool(10)) {
+            List<Future<PaymentResponse>> futures = new ArrayList<>();
 
-        paymentRequests.forEach(paymentRequest ->
-                futures.add(executorService.submit(() ->
-                        paymentProcessorService.processPayment(paymentRequest)
-                ))
-        );
+            paymentRequests.forEach(paymentRequest ->
+                    futures.add(executorService.submit(() ->
+                            paymentProcessorService.processPayment(paymentRequest)
+                    ))
+            );
 
-        List<PaymentResponse> responses = new ArrayList<>();
+            /*
+            List<PaymentResponse> responses = new ArrayList<>();
+            for (Future<PaymentResponse> future : futures) {
+                PaymentResponse response = future.get(); // This will block until the response is available
+                responses.add(response);
+            }
+            return responses;
+            */
 
-        for (Future<PaymentResponse> future : futures) {
-            PaymentResponse response = future.get(); // This will block until the response is available
-            responses.add(response);
+            List<CompletableFuture<PaymentResponse>> completableFutures = futures.stream()
+                    .map(future -> CompletableFuture.supplyAsync(() -> {
+                        try {
+                            return future.get();
+                        } catch (Exception e) {
+                            throw new CompletionException(e);
+                        }
+                    }))
+                    .toList();
+            // Wait for all futures to complete
+            CompletableFuture.allOf(
+                    completableFutures.toArray(new CompletableFuture[0])).join();
+
+            List<PaymentResponse> responses = completableFutures.stream()
+                    .map(CompletableFuture::join)
+                    .toList();
+            return responses;
         }
-        executorService.shutdown();
-        return responses;
     }
 }

@@ -1,6 +1,7 @@
 package com.sppxs.europa.shipping.entity;
 
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -8,11 +9,18 @@ import java.util.Set;
 
 @Entity
 @Table(name = "shipping_details")
+@EqualsAndHashCode(of = "id")
 public class ShippingDetails implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
+    @Version
+    private Long version;
+
+    //@NotNull
+    //ToDo: @Index(name = "idx_shipping_details_po_id")
+    @Column(name = "purchase_order_id", nullable = false)
     private String purchaseOrderId;
     @OneToMany(mappedBy = "shippingDetails", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Shipment> shipments = new HashSet<>();

@@ -10,6 +10,9 @@ public class AddressInfo {
     @Column(name = "id", nullable = false)
     private Long id;
     private String type;
+
+    //@Enumerated(EnumType.STRING)
+    @Column(length = 20)
     private String line1;
     private String line2;
     private String city;

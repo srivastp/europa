@@ -12,7 +12,10 @@ import com.sppxs.europa.payment.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @Service
 public class PaymentService {
@@ -36,6 +39,8 @@ public class PaymentService {
             throw new RuntimeException(e);
         }
         //Create a payment type detail
+        //ToDo: Storing full card numbers, CVVs, bank account details, and routing numbers in the database can violate compliance requirements (e.g., PCI-DSS).
+        // Consider masking or encrypting these fields, and never store CVV in plain text.
         PaymentTypeDetail paymentTypeDetail = new PaymentTypeDetail();
         paymentTypeDetail.setCardNumber("8888-5678-1234-5678");
         paymentTypeDetail.setCardType("Mastercard");
@@ -74,7 +79,8 @@ public class PaymentService {
         //Process the payment
         Set<Transaction> transSet = new HashSet<>();
         externalPaymentServiceProcessor.processPayment(payload)
-                .thenAccept(responses -> {
+                //.thenAccept(responses -> {
+                .thenApply((responses -> {
                     System.out.println("%%% Responses receiving here finally");
                     for (int i = 0; i < responses.size(); i++) {
                         PaymentResponse pr = responses.get(i);
@@ -91,7 +97,8 @@ public class PaymentService {
                         }
                         transSet.add(transaction);
                     }
-                });
+                    return responses;
+                })).join(); // block the current thread until responses are received
 
 
         //Update the status of the payment

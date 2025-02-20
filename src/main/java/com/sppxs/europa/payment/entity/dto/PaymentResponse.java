@@ -1,13 +1,8 @@
 package com.sppxs.europa.payment.entity.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-
 public class PaymentResponse {
     private String status;
+    //ToDo: private PaymentStatus status;
     private String extTransactionId;
     private String purchaseOrderId;
     private String transactionId;
@@ -18,6 +13,7 @@ public class PaymentResponse {
     public PaymentResponse(String status) {
         this.status = status;
     }
+
     public PaymentResponse(String status, String extTransactionId, String purchaseOrderId, String transactionId) {
         this.status = status;
         this.extTransactionId = extTransactionId;
@@ -55,5 +51,10 @@ public class PaymentResponse {
 
     public void setTransactionId(String transactionId) {
         this.transactionId = transactionId;
+    }
+
+
+    public enum PaymentStatus {
+        SUCCESS, FAILURE, PENDING
     }
 }
