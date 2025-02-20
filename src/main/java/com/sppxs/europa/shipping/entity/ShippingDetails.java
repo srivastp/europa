@@ -50,12 +50,18 @@ public class ShippingDetails implements Serializable {
     }
 
     public void addShipment(Shipment shipment) {
+        if (shipment == null) {
+            return;
+        }
         shipments.add(shipment);
         shipment.setShippingDetails(this);
     }
 
     public void removeShipment(Shipment shipment) {
+        if (shipment == null) {
+            return;
+        }
         shipments.remove(shipment);
         shipment.setShippingDetails(null);
+
     }
-}

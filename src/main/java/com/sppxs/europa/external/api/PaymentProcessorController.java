@@ -40,6 +40,8 @@ public class PaymentProcessorController {
             return responses;
             */
 
+            // By default, CompletableFuture.supplyAsync uses the common ForkJoinPool. If you intend to use the
+            // custom executorService you declared, pass it as a second argument:
             List<CompletableFuture<PaymentResponse>> completableFutures = futures.stream()
                     .map(future -> CompletableFuture.supplyAsync(() -> {
                         try {
@@ -47,7 +49,7 @@ public class PaymentProcessorController {
                         } catch (Exception e) {
                             throw new CompletionException(e);
                         }
-                    }))
+                    }, executorService))
                     .toList();
             // Wait for all futures to complete
             CompletableFuture.allOf(

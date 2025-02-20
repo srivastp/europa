@@ -93,4 +93,11 @@ public class Transaction implements Serializable {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public enum TransactionType {
+        DEBIT,
+        CREDIT,
+        REFUND,
+        CHARGEBACK
+    }
 }
