@@ -1,6 +1,5 @@
 package com.sppxs.europa.payment.entity;
 
-import com.sppxs.europa.order.events.domain.PurchaseOrderCreatedEvent;
 import com.sppxs.europa.payment.domain.PaymentCreatedEvent;
 import jakarta.persistence.*;
 import org.springframework.data.domain.AfterDomainEventPublication;
@@ -39,7 +38,6 @@ public class Payment implements Serializable {
     public void clearDomainEvents() {
         System.out.println(">> All payments published !!");
     }
-
 
 
     public Long getId() {
@@ -109,5 +107,17 @@ public class Payment implements Serializable {
         transactions.remove(transaction);
         transaction.setPayment(null);
         amount -= transaction.getAmount();
+    }
+
+    public void addTransactions(Set<Transaction> transactions) {
+        for (Object transaction : transactions) {
+            addTransaction((Transaction) transaction);
+        }
+    }
+
+    public void removeTransactions(Set<Transaction> transactions) {
+        for (Object transaction : transactions) {
+            removeTransaction((Transaction) transaction);
+        }
     }
 }

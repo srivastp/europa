@@ -1,12 +1,12 @@
 package com.sppxs.europa.payment.api;
 
-import com.sppxs.europa.order.entity.PurchaseOrder;
 import com.sppxs.europa.payment.entity.Payment;
 import com.sppxs.europa.payment.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -23,6 +23,7 @@ public class PaymentController {
 
     @PostMapping
     public List<Payment> createPayment(@RequestBody List<Payment> payments) {
-        return paymentService.createPayment(payments);
+        return Collections.emptyList();
+        //return paymentService.createPayment(payments);
     }
 }
