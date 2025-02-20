@@ -1,7 +1,9 @@
-package com.sppxs.europa.dto.mapper;
+package com.sppxs.europa.order.dto.mapper;
 
-import com.sppxs.europa.dto.PurchaseOrderItemDto;
-import com.sppxs.europa.entity.PurchaseOrderItem;
+
+import com.sppxs.europa.order.dto.PurchaseOrderItemDto;
+import com.sppxs.europa.order.entity.Item;
+import com.sppxs.europa.order.entity.PurchaseOrderItem;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.processing.Generated;
@@ -21,6 +23,14 @@ public class PurchaseOrderItemMapperImpl implements PurchaseOrderItemMapper {
         }
 
         PurchaseOrderItem purchaseOrderItem = new PurchaseOrderItem();
+        purchaseOrderItem.setQuantity(purchaseOrderItemDto.getQuantity());
+        if (purchaseOrderItemDto.getItem() != null) {
+            Item item = new Item();
+            item.setSku(purchaseOrderItemDto.getItem().getSku());
+            item.setName(purchaseOrderItemDto.getItem().getName());
+            item.setUnitPrice(purchaseOrderItemDto.getItem().getUnitPrice());
+            purchaseOrderItem.setItem(item);
+        }
 
         return purchaseOrderItem;
     }
@@ -30,15 +40,16 @@ public class PurchaseOrderItemMapperImpl implements PurchaseOrderItemMapper {
         if (purchaseOrderItem == null) {
             return null;
         }
-        PurchaseOrderItemDto.NestedItemDto nestedPOItemDto = new PurchaseOrderItemDto.NestedItemDto();
-        nestedPOItemDto.setSku(purchaseOrderItem.getItem().getSku());
-        nestedPOItemDto.setName(purchaseOrderItem.getItem().getName());
-        nestedPOItemDto.setUnitPrice(purchaseOrderItem.getItem().getUnitPrice());
-
         PurchaseOrderItemDto purchaseOrderItemDto = new PurchaseOrderItemDto();
-        purchaseOrderItemDto.setItem(nestedPOItemDto);
         purchaseOrderItemDto.setQuantity(purchaseOrderItem.getQuantity());
 
+        if (purchaseOrderItem.getItem() != null) {
+            PurchaseOrderItemDto.NestedItemDto nestedPOItemDto = new PurchaseOrderItemDto.NestedItemDto();
+            nestedPOItemDto.setSku(purchaseOrderItem.getItem().getSku());
+            nestedPOItemDto.setName(purchaseOrderItem.getItem().getName());
+            nestedPOItemDto.setUnitPrice(purchaseOrderItem.getItem().getUnitPrice());
+            purchaseOrderItemDto.setItem(nestedPOItemDto);
+        }
         return purchaseOrderItemDto;
     }
 
@@ -48,6 +59,7 @@ public class PurchaseOrderItemMapperImpl implements PurchaseOrderItemMapper {
             return purchaseOrderItem;
         }
         //ToDo: Implement partial update logic
+
         return purchaseOrderItem;
     }
 }

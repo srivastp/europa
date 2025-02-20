@@ -1,4 +1,4 @@
-package com.sppxs.europa.entity;
+package com.sppxs.europa.order.entity;
 
 import jakarta.persistence.*;
 
@@ -11,9 +11,13 @@ public class Item implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
+
+    @Column(nullable = false, unique = true)
     private Long sku;
+    @Column(nullable = false)
     private String name;
     private String description;
+
     private double unitPrice;
     private int quantity;
 

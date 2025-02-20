@@ -1,10 +1,10 @@
-package com.sppxs.europa.api;
+package com.sppxs.europa.order.api;
 
-import com.sppxs.europa.dto.PurchaseOrderDto;
-import com.sppxs.europa.dto.mapper.PurchaseOrderMapper;
-import com.sppxs.europa.entity.PurchaseOrder;
-import com.sppxs.europa.entity.PurchaseOrderItem;
-import com.sppxs.europa.service.PurchaseOrderService;
+import com.sppxs.europa.order.dto.PurchaseOrderDto;
+import com.sppxs.europa.order.dto.mapper.PurchaseOrderMapper;
+import com.sppxs.europa.order.entity.PurchaseOrder;
+import com.sppxs.europa.order.entity.PurchaseOrderItem;
+import com.sppxs.europa.order.service.PurchaseOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,10 +1,10 @@
 package com.sppxs.europa;
 
-import com.sppxs.europa.entity.Item;
-import com.sppxs.europa.entity.PurchaseOrder;
-import com.sppxs.europa.entity.PurchaseOrderItem;
-import com.sppxs.europa.repository.ItemRepository;
-import com.sppxs.europa.repository.PurchaseOrderRepository;
+import com.sppxs.europa.order.entity.Item;
+import com.sppxs.europa.order.entity.PurchaseOrder;
+import com.sppxs.europa.order.entity.PurchaseOrderItem;
+import com.sppxs.europa.order.repository.ItemRepository;
+import com.sppxs.europa.order.repository.PurchaseOrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +55,13 @@ public class SetupData implements CommandLineRunner {
                 for (int j = 0; j < repeat; j++) {
                     PurchaseOrderItem i1 = new PurchaseOrderItem();
                     //Get a random item from the item repository
-                    i1.setItem(itemRepository.findById(new Random().nextInt(9) + 1L).get());
+                    //i1.setItem(itemRepository.findById(new Random().nextInt(9) + 1L).get());
+                    itemRepository.findById(new Random().nextInt(9) + 1L)
+                            .ifPresentOrElse(
+                                    i1::setItem, () -> {
+                                        throw new IllegalStateException("Item not found");
+                                    }
+                            );
                     //Set a random quantity
                     i1.setQuantity(new Random().nextInt(9) + 1);
                     purchaseOrder.addOrderItem(i1);
@@ -65,6 +71,32 @@ public class SetupData implements CommandLineRunner {
             purchaseOrderRepository.saveAll(pos);
             System.out.println(">>>> Loaded Orders");
         }
+
+        //Create 2 Purchase Orders
+        Set<PurchaseOrder> pos = new HashSet<>();
+        for (int i = 0; i < 5; i++) {
+            pos.add(createPurchaseOrder());
+        }
+        purchaseOrderRepository.saveAll(pos);
+    }
+
+    private PurchaseOrder createPurchaseOrder() {
+        PurchaseOrder purchaseOrder = new PurchaseOrder();
+        purchaseOrder.setGuid(UUID.randomUUID().toString());
+        PurchaseOrderItem i1 = new PurchaseOrderItem();
+        //Get a random item from the item repository
+        i1.setItem(itemRepository.findById(new Random().nextInt(9) + 1L).get());
+        itemRepository.findById(new Random().nextInt(9) + 1L)
+                .ifPresentOrElse(
+                        i1::setItem, () -> {
+                            throw new IllegalStateException("Item not found");
+                        }
+                );
+        //Set a random quantity
+        i1.setQuantity(new Random().nextInt(9) + 1);
+        purchaseOrder.addOrderItem(i1);
+        //purchaseOrderRepository.save(purchaseOrder);
+        return purchaseOrder;
     }
 
 }

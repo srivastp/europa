@@ -1,7 +1,7 @@
-package com.sppxs.europa.dto.mapper;
+package com.sppxs.europa.order.dto.mapper;
 
-import com.sppxs.europa.dto.PurchaseOrderDto;
-import com.sppxs.europa.entity.PurchaseOrder;
+import com.sppxs.europa.order.dto.PurchaseOrderDto;
+import com.sppxs.europa.order.entity.PurchaseOrder;
 
 
 public interface PurchaseOrderMapper {

@@ -1,12 +1,11 @@
-package com.sppxs.europa.dto;
+package com.sppxs.europa.order.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.sppxs.europa.entity.Item;
-import com.sppxs.europa.entity.PurchaseOrderItem;
+import com.sppxs.europa.order.entity.Item;
+import com.sppxs.europa.order.entity.PurchaseOrderItem;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Value;
 
 import java.io.Serializable;
 
