@@ -8,7 +8,7 @@ import org.testcontainers.utility.DockerImageName;
 
 @TestConfiguration(proxyBeanMethods = false)
 class TestcontainersConfiguration {
-    private static final String MYSQL_VERSION = "8.0.32";
+    private static final String MYSQL_VERSION = "8.0.41";
     private static final int MYSQL_PORT = 3306;
     private static final String MYSQL_DATABASE = "test";
     private static final String MYSQL_USER = "test";

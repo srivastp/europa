@@ -3,6 +3,7 @@ package com.sppxs.europa.order.service;
 import com.sppxs.europa.order.entity.PurchaseOrder;
 import com.sppxs.europa.order.entity.PurchaseOrderItem;
 import com.sppxs.europa.order.repository.PurchaseOrderRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ public class PurchaseOrderService {
     @Autowired
     private PurchaseOrderRepository purchaseOrderRepository;
 
+    @Transactional
     public PurchaseOrder createOrder(List<PurchaseOrderItem> orderItems) {
         if (orderItems == null || orderItems.isEmpty()) {
             throw new IllegalArgumentException("Order items cannot be null or empty");

@@ -86,6 +86,12 @@ public class SetupData implements CommandLineRunner {
         PurchaseOrderItem i1 = new PurchaseOrderItem();
         //Get a random item from the item repository
         i1.setItem(itemRepository.findById(new Random().nextInt(9) + 1L).get());
+        itemRepository.findById(new Random().nextInt(9) + 1L)
+                .ifPresentOrElse(
+                        i1::setItem, () -> {
+                            throw new IllegalStateException("Item not found");
+                        }
+                );
         //Set a random quantity
         i1.setQuantity(new Random().nextInt(9) + 1);
         purchaseOrder.addOrderItem(i1);

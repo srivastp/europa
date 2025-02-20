@@ -40,18 +40,16 @@ public class PurchaseOrderItemMapperImpl implements PurchaseOrderItemMapper {
         if (purchaseOrderItem == null) {
             return null;
         }
-        if (purchaseOrderItem.getItem() == null) {
-            return null;
-        }
-        PurchaseOrderItemDto.NestedItemDto nestedPOItemDto = new PurchaseOrderItemDto.NestedItemDto();
-        nestedPOItemDto.setSku(purchaseOrderItem.getItem().getSku());
-        nestedPOItemDto.setName(purchaseOrderItem.getItem().getName());
-        nestedPOItemDto.setUnitPrice(purchaseOrderItem.getItem().getUnitPrice());
-
         PurchaseOrderItemDto purchaseOrderItemDto = new PurchaseOrderItemDto();
-        purchaseOrderItemDto.setItem(nestedPOItemDto);
         purchaseOrderItemDto.setQuantity(purchaseOrderItem.getQuantity());
 
+        if (purchaseOrderItem.getItem() != null) {
+            PurchaseOrderItemDto.NestedItemDto nestedPOItemDto = new PurchaseOrderItemDto.NestedItemDto();
+            nestedPOItemDto.setSku(purchaseOrderItem.getItem().getSku());
+            nestedPOItemDto.setName(purchaseOrderItem.getItem().getName());
+            nestedPOItemDto.setUnitPrice(purchaseOrderItem.getItem().getUnitPrice());
+            purchaseOrderItemDto.setItem(nestedPOItemDto);
+        }
         return purchaseOrderItemDto;
     }
 
