@@ -1,6 +1,8 @@
 package com.sppxs.europa.order.dto.mapper;
 
+
 import com.sppxs.europa.order.dto.PurchaseOrderItemDto;
+import com.sppxs.europa.order.entity.Item;
 import com.sppxs.europa.order.entity.PurchaseOrderItem;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +23,14 @@ public class PurchaseOrderItemMapperImpl implements PurchaseOrderItemMapper {
         }
 
         PurchaseOrderItem purchaseOrderItem = new PurchaseOrderItem();
+        purchaseOrderItem.setQuantity(purchaseOrderItemDto.getQuantity());
+        if (purchaseOrderItemDto.getItem() != null) {
+            Item item = new Item();
+            item.setSku(purchaseOrderItemDto.getItem().getSku());
+            item.setName(purchaseOrderItemDto.getItem().getName());
+            item.setUnitPrice(purchaseOrderItemDto.getItem().getUnitPrice());
+            purchaseOrderItem.setItem(item);
+        }
 
         return purchaseOrderItem;
     }
@@ -28,6 +38,9 @@ public class PurchaseOrderItemMapperImpl implements PurchaseOrderItemMapper {
     @Override
     public PurchaseOrderItemDto toDto(PurchaseOrderItem purchaseOrderItem) {
         if (purchaseOrderItem == null) {
+            return null;
+        }
+        if (purchaseOrderItem.getItem() == null) {
             return null;
         }
         PurchaseOrderItemDto.NestedItemDto nestedPOItemDto = new PurchaseOrderItemDto.NestedItemDto();
@@ -48,6 +61,7 @@ public class PurchaseOrderItemMapperImpl implements PurchaseOrderItemMapper {
             return purchaseOrderItem;
         }
         //ToDo: Implement partial update logic
+
         return purchaseOrderItem;
     }
 }

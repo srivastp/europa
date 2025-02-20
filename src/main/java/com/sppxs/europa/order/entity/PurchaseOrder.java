@@ -16,6 +16,8 @@ public class PurchaseOrder implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
+    @Column(name = "guid", nullable = false, unique = true)
+    //@Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
     private String guid;
     @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PurchaseOrderItem> purchaseOrderItems = new ArrayList<>();
@@ -68,9 +70,15 @@ public class PurchaseOrder implements Serializable {
     }
 
     public void addOrderItem(PurchaseOrderItem purchaseOrderItem) {
-        purchaseOrderItems.add(purchaseOrderItem);
-        purchaseOrderItem.setOrder(this);
-        amount += purchaseOrderItem.getTotalPrice();
+        try {
+            purchaseOrderItems.add(purchaseOrderItem);
+            purchaseOrderItem.setOrder(this);
+            amount = purchaseOrderItem.getTotalPrice();
+        } catch (Exception e) {
+            purchaseOrderItems.remove(purchaseOrderItem);
+            purchaseOrderItem.setOrder(null);
+            throw e;
+        }
     }
 
     public void removeOrderItem(PurchaseOrderItem purchaseOrderItem) {

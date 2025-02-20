@@ -25,6 +25,14 @@ public class PurchaseOrderMapperImpl implements PurchaseOrderMapper {
         }
 
         PurchaseOrder purchaseOrder = new PurchaseOrder();
+        purchaseOrder.setId(purchaseOrderDto.getId());
+        purchaseOrder.setGuid(purchaseOrderDto.getGuid());
+        purchaseOrder.setAmount(purchaseOrderDto.getAmount());
+        if (purchaseOrderDto.getPurchaseOrderItems() != null) {
+            purchaseOrderDto.getPurchaseOrderItems().stream()
+                    .map(purchaseOrderItemMapper::toEntity)
+                    .forEach(purchaseOrder::addOrderItem);
+        }
 
         return purchaseOrder;
     }
@@ -54,6 +62,20 @@ public class PurchaseOrderMapperImpl implements PurchaseOrderMapper {
             return purchaseOrder;
         }
         //ToDo: Implement partial update logic
+        if (purchaseOrderDto.getId() != null) {
+            purchaseOrder.setId(purchaseOrderDto.getId());
+        }
+        if (purchaseOrderDto.getGuid() != null) {
+            purchaseOrder.setGuid(purchaseOrderDto.getGuid());
+        }
+        purchaseOrder.setAmount(purchaseOrderDto.getAmount());
+
+        if (purchaseOrderDto.getPurchaseOrderItems() != null) {
+            purchaseOrder.getPurchaseOrderItems().clear();
+            purchaseOrderDto.getPurchaseOrderItems().stream()
+                    .map(purchaseOrderItemMapper::toEntity)
+                    .forEach(purchaseOrder::addOrderItem);
+        }
         return purchaseOrder;
     }
 }
