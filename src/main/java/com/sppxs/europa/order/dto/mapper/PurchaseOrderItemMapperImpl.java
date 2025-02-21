@@ -7,6 +7,7 @@ import com.sppxs.europa.order.entity.PurchaseOrderItem;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.processing.Generated;
+import java.math.BigDecimal;
 
 @Generated(
         value = "org.mapstruct.ap.MappingProcessor",
@@ -28,7 +29,7 @@ public class PurchaseOrderItemMapperImpl implements PurchaseOrderItemMapper {
             Item item = new Item();
             item.setSku(purchaseOrderItemDto.getItem().getSku());
             item.setName(purchaseOrderItemDto.getItem().getName());
-            item.setUnitPrice(purchaseOrderItemDto.getItem().getUnitPrice());
+            item.setUnitPrice(BigDecimal.valueOf(purchaseOrderItemDto.getItem().getUnitPrice()));
             purchaseOrderItem.setItem(item);
         }
 
@@ -47,7 +48,7 @@ public class PurchaseOrderItemMapperImpl implements PurchaseOrderItemMapper {
             PurchaseOrderItemDto.NestedItemDto nestedPOItemDto = new PurchaseOrderItemDto.NestedItemDto();
             nestedPOItemDto.setSku(purchaseOrderItem.getItem().getSku());
             nestedPOItemDto.setName(purchaseOrderItem.getItem().getName());
-            nestedPOItemDto.setUnitPrice(purchaseOrderItem.getItem().getUnitPrice());
+            nestedPOItemDto.setUnitPrice(purchaseOrderItem.getItem().getUnitPrice().doubleValue());
             purchaseOrderItemDto.setItem(nestedPOItemDto);
         }
         return purchaseOrderItemDto;

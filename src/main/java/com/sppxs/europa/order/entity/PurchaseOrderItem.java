@@ -1,21 +1,21 @@
 package com.sppxs.europa.order.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sppxs.europa.shared.entity.BaseEntity;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
+import java.math.BigDecimal;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "purchase_order_item")
-public class PurchaseOrderItem implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonIgnore
-    private Long id;
+public class PurchaseOrderItem extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "purchase_order_id")
@@ -28,39 +28,8 @@ public class PurchaseOrderItem implements Serializable {
 
     private int quantity;
 
-    public double getTotalPrice() {
-        return item.getUnitPrice() * quantity;
+    public BigDecimal getTotalPrice() {
+        return item.getUnitPrice().multiply(BigDecimal.valueOf(quantity));
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public PurchaseOrder getOrder() {
-        return purchaseOrder;
-    }
-
-    public void setOrder(PurchaseOrder purchaseOrder) {
-        this.purchaseOrder = purchaseOrder;
-    }
-
-    public Item getItem() {
-        return item;
-    }
-
-    public void setItem(Item item) {
-        this.item = item;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
 }

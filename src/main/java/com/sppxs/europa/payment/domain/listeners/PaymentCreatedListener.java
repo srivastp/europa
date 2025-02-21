@@ -1,6 +1,7 @@
 package com.sppxs.europa.payment.domain.listeners;
 
 import com.sppxs.europa.payment.domain.PaymentCreatedEvent;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
@@ -8,14 +9,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
+@Slf4j
 public class PaymentCreatedListener {
     private static final Logger logger = LoggerFactory.getLogger(PaymentCreatedListener.class);
 
-    //@EventListener // -- method will get executed even if the save/update operation was rolled back
-    @TransactionalEventListener(classes = PaymentCreatedEvent.class) // -- will execute only if the transaction is committed
+    //When using @EventListener - method will get executed even if the save/update operation was rolled back
+    //Using TransactionalEventListener Method will execute only if the transaction is committed
+    @TransactionalEventListener(classes = PaymentCreatedEvent.class)
     @Async
     public void handleMyDomainEvent(PaymentCreatedEvent event) {
         System.out.println("PaymentCreatedEvent - id: " + event.getPaymentId() + " | Amount: " + event.getAmount());
+        logger.info("PaymentCreatedEvent - id: " + event.getPaymentId() + " | Amount: " + event.getAmount());
+
         //Asynchronously send an email to the user
         //Asynchronously send a SQS message notification
         //What if the Publish event fails?? How to handle it??
@@ -72,7 +77,5 @@ public class PaymentCreatedListener {
             // Implementation
         }
          */
-
-
     }
 }

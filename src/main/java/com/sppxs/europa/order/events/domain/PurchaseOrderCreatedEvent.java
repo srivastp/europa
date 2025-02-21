@@ -1,22 +1,20 @@
 package com.sppxs.europa.order.events.domain;
 
-//@Getter
+import lombok.Getter;
+
+import java.math.BigDecimal;
+
+@Getter
 //@AllArgsConstructor
 public class PurchaseOrderCreatedEvent {
+
     private final String purchaseOrderGuid;
-    private final double amount;
+
+    private final BigDecimal amount;
 
     //Create a constructor with the purchaseOrderGuid and amount as parameters
-    public PurchaseOrderCreatedEvent(String purchaseOrderGuid, double amount) {
+    public PurchaseOrderCreatedEvent(String purchaseOrderGuid, BigDecimal amount) {
         this.purchaseOrderGuid = purchaseOrderGuid;
         this.amount = amount;
-    }
-
-    public String getPurchaseOrderGuid() {
-        return purchaseOrderGuid;
-    }
-
-    public double getAmount() {
-        return amount;
     }
 }

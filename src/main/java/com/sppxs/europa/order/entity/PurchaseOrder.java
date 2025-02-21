@@ -1,45 +1,44 @@
 package com.sppxs.europa.order.entity;
 
+import com.sppxs.europa.order.enums.POStatus;
 import com.sppxs.europa.order.events.domain.PurchaseOrderCreatedEvent;
+import com.sppxs.europa.shared.entity.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.domain.AfterDomainEventPublication;
 import org.springframework.data.domain.DomainEvents;
 
-import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "purchase_order")
-public class PurchaseOrder implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
-    private Long id;
+public class PurchaseOrder extends BaseEntity {
+
     @Column(name = "guid", nullable = false, unique = true)
-    //@Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
+    @NotBlank(message = "guid cannot be empty")
+    @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
     private String guid;
+
     @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PurchaseOrderItem> purchaseOrderItems = new ArrayList<>();
-    private double amount;
+
+    private BigDecimal amount = BigDecimal.ZERO;
 
     private String username;
-    private String status;
 
-    /*
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private Instant createdAt;
-
-    @LastModifiedDate
-    @Column(nullable = false)
-    private Instant updatedAt;
-    */
-
-    public enum OrderStatus {
-        CREATED, DECLINED, READY_TO_SHIP, PENDING
-    }
-
+    private POStatus status;
 
     //@Transient
     //private final List<Object> purchaseOrderDomainEvents = new ArrayList<>();
@@ -51,72 +50,18 @@ public class PurchaseOrder implements Serializable {
 
     @AfterDomainEventPublication
     public void clearDomainEvents() {
-        System.out.println(">> All events published !!");
+        System.out.println(">> PO events published !!");
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getGuid() {
-        return guid;
-    }
-
-    public void setGuid(String guid) {
-        this.guid = guid;
-    }
-
-    public double getAmount() {
-        return amount;
-    }
-
-    public List<PurchaseOrderItem> getPurchaseOrderItems() {
-        return purchaseOrderItems;
-    }
-
-    public void setAmount(double amount) {
-        this.amount = amount;
-    }
-
-    public void setPurchaseOrderItems(List<PurchaseOrderItem> purchaseOrderItems) {
-        this.purchaseOrderItems = purchaseOrderItems;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public void addOrderItem(PurchaseOrderItem purchaseOrderItem) {
-        try {
-            purchaseOrderItems.add(purchaseOrderItem);
-            purchaseOrderItem.setOrder(this);
-            amount = purchaseOrderItem.getTotalPrice();
-        } catch (Exception e) {
-            purchaseOrderItems.remove(purchaseOrderItem);
-            purchaseOrderItem.setOrder(null);
-            throw e;
-        }
+    public void addOrderItem(@NotNull PurchaseOrderItem purchaseOrderItem) {
+        purchaseOrderItems.add(purchaseOrderItem);
+        purchaseOrderItem.setPurchaseOrder(this);
+        amount = amount.add(purchaseOrderItem.getTotalPrice());
     }
 
     public void removeOrderItem(PurchaseOrderItem purchaseOrderItem) {
         purchaseOrderItems.remove(purchaseOrderItem);
-        purchaseOrderItem.setOrder(null);
-        amount -= purchaseOrderItem.getTotalPrice();
+        purchaseOrderItem.setPurchaseOrder(null);
+        amount = amount.subtract(purchaseOrderItem.getTotalPrice());
     }
 }

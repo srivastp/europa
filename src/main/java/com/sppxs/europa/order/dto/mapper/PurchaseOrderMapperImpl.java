@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.processing.Generated;
+import java.math.BigDecimal;
 import java.util.stream.Collectors;
 
 @Generated(
@@ -27,7 +28,7 @@ public class PurchaseOrderMapperImpl implements PurchaseOrderMapper {
         PurchaseOrder purchaseOrder = new PurchaseOrder();
         purchaseOrder.setId(purchaseOrderDto.getId());
         purchaseOrder.setGuid(purchaseOrderDto.getGuid());
-        purchaseOrder.setAmount(purchaseOrderDto.getAmount());
+        purchaseOrder.setAmount(BigDecimal.valueOf(purchaseOrderDto.getAmount()));
         if (purchaseOrderDto.getPurchaseOrderItems() != null) {
             purchaseOrderDto.getPurchaseOrderItems().stream()
                     .map(purchaseOrderItemMapper::toEntity)
@@ -45,7 +46,7 @@ public class PurchaseOrderMapperImpl implements PurchaseOrderMapper {
         PurchaseOrderDto purchaseOrderDto = new PurchaseOrderDto();
         purchaseOrderDto.setId(purchaseOrder.getId());
         purchaseOrderDto.setGuid(purchaseOrder.getGuid());
-        purchaseOrderDto.setAmount(purchaseOrder.getAmount());
+        purchaseOrderDto.setAmount(purchaseOrder.getAmount().doubleValue());
         purchaseOrderDto.setPurchaseOrderItems(
                 purchaseOrder.getPurchaseOrderItems()
                         .stream()
@@ -68,7 +69,7 @@ public class PurchaseOrderMapperImpl implements PurchaseOrderMapper {
         if (purchaseOrderDto.getGuid() != null) {
             purchaseOrder.setGuid(purchaseOrderDto.getGuid());
         }
-        purchaseOrder.setAmount(purchaseOrderDto.getAmount());
+        purchaseOrder.setAmount(BigDecimal.valueOf(purchaseOrderDto.getAmount()));
 
         if (purchaseOrderDto.getPurchaseOrderItems() != null) {
             purchaseOrder.getPurchaseOrderItems().clear();

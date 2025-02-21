@@ -1,18 +1,27 @@
 package com.sppxs.europa.order.events.domain.listeners;
 
 import com.sppxs.europa.order.events.domain.PurchaseOrderCreatedEvent;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
+@Slf4j
 public class PurchaseOrderCreatedListener {
 
-    //@EventListener // -- method will get executed even if the save/update operation was rolled back
-    @TransactionalEventListener(classes = PurchaseOrderCreatedEvent.class) // -- will execute only if the transaction is committed
+    private static final Logger logger = LoggerFactory.getLogger(PurchaseOrderCreatedListener.class);
+
+    //When using @EventListener - method will get executed even if the save/update operation was rolled back
+    //Using TransactionalEventListener Method will execute only if the transaction is committed
+    @TransactionalEventListener(classes = PurchaseOrderCreatedEvent.class)
+    // -- will execute only if the transaction is committed
     @Async
     public void handleMyDomainEvent(PurchaseOrderCreatedEvent event) {
-        System.out.println("PurchaseOrderCreatedEvent - Guid: " + event.getPurchaseOrderGuid() + " | Amount: " + event.getAmount());
+        logger.info("PurchaseOrderCreatedEvent - Guid: " + event.getPurchaseOrderGuid() + " | Amount: " + event.getAmount());
+
         //Asynchronously send an email to the user
         //Asynchronously send a SQS message notification
         //What if the Publish event fails?? How to handle it??
@@ -59,7 +68,5 @@ public class PurchaseOrderCreatedListener {
             }
         }
          */
-
-
     }
 }

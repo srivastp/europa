@@ -1,22 +1,22 @@
 package com.sppxs.europa.payment.domain;
 
-//@Getter
+import com.sppxs.europa.payment.entity.Transaction;
+import lombok.Getter;
+
+
+import java.math.BigDecimal;
+import java.util.Set;
+
+@Getter
 //@AllArgsConstructor
 public class PaymentCreatedEvent {
     private final String paymentId;
-    private final double amount;
+    private final Set<Transaction> transactionId;
+    private final BigDecimal amount;
 
-    //Create a constructor with the purchaseOrderGuid and amount as parameters
-    public PaymentCreatedEvent(String paymentId, double amount) {
+    public PaymentCreatedEvent(String paymentId, Set<Transaction> transactionId, BigDecimal amount) {
         this.paymentId = paymentId;
+        this.transactionId = transactionId;
         this.amount = amount;
-    }
-
-    public String getPaymentId() {
-        return paymentId;
-    }
-
-    public double getAmount() {
-        return amount;
     }
 }

@@ -4,29 +4,43 @@ import com.sppxs.europa.order.entity.PurchaseOrder;
 import com.sppxs.europa.payment.entity.Payment;
 import com.sppxs.europa.payment.entity.PaymentTypeDetail;
 import com.sppxs.europa.payment.entity.Transaction;
-import com.sppxs.europa.payment.entity.dto.PaymentRequest;
-import com.sppxs.europa.payment.entity.dto.PaymentResponse;
+import com.sppxs.europa.payment.entity.dto.TransactionRequest;
+import com.sppxs.europa.payment.entity.dto.TransactionResponse;
 import com.sppxs.europa.payment.repository.PaymentRepository;
 import com.sppxs.europa.payment.repository.PaymentTypeDetailRepository;
 import com.sppxs.europa.payment.repository.TransactionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.sppxs.europa.payment.enums.PaymentStatus.*;
+import static com.sppxs.europa.payment.enums.Transaction.TransactionType.CREDIT;
+
 @Service
+@Slf4j
 public class PaymentService {
-    @Autowired
-    private PaymentRepository paymentRepository;
-    @Autowired
-    private TransactionRepository transactionRepository;
-    @Autowired
-    private PaymentTypeDetailRepository paymentTypeDetailRepository;
-    @Autowired
-    private ExternalPaymentServiceProcessor externalPaymentServiceProcessor;
+    private static final Logger logger = LoggerFactory.getLogger(PaymentService.class);
+    private final PaymentRepository paymentRepository;
+    private final TransactionRepository transactionRepository;
+    private final PaymentTypeDetailRepository paymentTypeDetailRepository;
+    private final ExternalPaymentServiceProcessor externalPaymentServiceProcessor;
+
+    public PaymentService(PaymentRepository paymentRepository,
+                          TransactionRepository transactionRepository,
+                          PaymentTypeDetailRepository paymentTypeDetailRepository,
+                          ExternalPaymentServiceProcessor externalPaymentServiceProcessor) {
+        this.paymentRepository = paymentRepository;
+        this.transactionRepository = transactionRepository;
+        this.paymentTypeDetailRepository = paymentTypeDetailRepository;
+        this.externalPaymentServiceProcessor = externalPaymentServiceProcessor;
+    }
 
     public List<Payment> findAll() {
         return paymentRepository.findAll();
@@ -39,7 +53,8 @@ public class PaymentService {
             throw new RuntimeException(e);
         }
         //Create a payment type detail
-        //ToDo: Storing full card numbers, CVVs, bank account details, and routing numbers in the database can violate compliance requirements (e.g., PCI-DSS).
+        //ToDo: Storing full card numbers, CVVs, bank account details, and routing numbers in the
+        // database can violate compliance requirements (e.g., PCI-DSS).
         // Consider masking or encrypting these fields, and never store CVV in plain text.
         PaymentTypeDetail paymentTypeDetail = new PaymentTypeDetail();
         paymentTypeDetail.setCardNumber("8888-5678-1234-5678");
@@ -47,6 +62,8 @@ public class PaymentService {
         paymentTypeDetail.setExpiryDate("12/2024");
         paymentTypeDetail.setCvv("789");
         paymentTypeDetail.setCardHolderName("Mary Jane");
+        paymentTypeDetail.setCreatedAt(Instant.now());
+        paymentTypeDetail.setUpdatedAt(Instant.now());
 
         PaymentTypeDetail ptd1 = paymentTypeDetailRepository.save(paymentTypeDetail);
 
@@ -54,9 +71,11 @@ public class PaymentService {
         Transaction transaction1 = new Transaction();
         transaction1.setTransactionId(UUID.randomUUID().toString());
         transaction1.setAmount(newPO.getAmount());
-        transaction1.setType("CREDIT");
+        transaction1.setType(CREDIT);
         transaction1.setPaymentTypeDetail(ptd1);
-        transaction1.setStatus("Pending");
+        transaction1.setStatus(com.sppxs.europa.payment.enums.Transaction.TransactionStatus.PENDING);
+        transaction1.setCreatedAt(Instant.now());
+        transaction1.setUpdatedAt(Instant.now());
         Set<Transaction> oldTransSet = new HashSet<>();
         oldTransSet.add(transaction1);
 
@@ -66,13 +85,15 @@ public class PaymentService {
         payment.setPurchaseOrderId(newPO.getGuid());
         payment.setUsername(newPO.getUsername());
         payment.addTransaction(transaction1);
-        payment.setStatus("Pending");
+        payment.setCreatedAt(Instant.now());
+        payment.setUpdatedAt(Instant.now());
+        payment.setStatus(PENDING);
 
         payment = paymentRepository.saveAndFlush(payment);
         Payment newPaymentObjCopy = payment;
 
         //Call the external payment service
-        List<PaymentRequest> payload = payment.getTransactions().stream()
+        List<TransactionRequest> payload = payment.getTransactions().stream()
                 .map(transaction -> generatePaymentRequestBuilder(transaction, newPaymentObjCopy)
                 ).toList();
 
@@ -80,53 +101,50 @@ public class PaymentService {
         Set<Transaction> transSet = new HashSet<>();
         externalPaymentServiceProcessor.processPayment(payload)
                 //.thenAccept(responses -> {
-                .thenApply((responses -> {
-                    System.out.println("%%% Responses receiving here finally");
-                    for (int i = 0; i < responses.size(); i++) {
-                        PaymentResponse pr = responses.get(i);
+                .thenApply(responses -> {
+                    logger.info("Evaluating External payment service responses.");
+                    for (TransactionResponse pr : responses) {
                         Transaction transaction = transactionRepository.findByTransactionId(pr.getTransactionId()).getFirst();
-                        if (responses.get(i).getStatus().equals("Success")) {
-                            transaction.setStatus(responses.get(i).getStatus());
-                            //transaction = transactionRepository.saveAndFlush(transaction);
-                            //newPaymentObj.setStatus("Success");
-                        } else if (responses.get(i).getStatus().equals("Declined")) {
-                            transaction.setStatus(responses.get(i).getStatus());
-                            //transaction = transactionRepository.saveAndFlush(transaction);
+                        if (pr.getStatus().equals(com.sppxs.europa.payment.enums.Transaction.TransactionStatus.SUCCESS)) {
+                            transaction.setStatus(com.sppxs.europa.payment.enums.Transaction.TransactionStatus.SUCCESS);
+                        } else if (pr.getStatus().equals(com.sppxs.europa.payment.enums.Transaction.TransactionStatus.DECLINED)) {
+                            transaction.setStatus(com.sppxs.europa.payment.enums.Transaction.TransactionStatus.DECLINED);
                         } else {
-                            logStatus(responses.get(i).getStatus());
+                            logStatus(pr.getStatus().toString());
                         }
                         transSet.add(transaction);
                     }
                     return responses;
-                })).join(); // block the current thread until responses are received
+                }).join(); // block the current thread until responses are received
 
+
+/*
+        boolean isTransactionErroredOnService = transSet
+                .stream()
+                .anyMatch(
+                        transaction -> transaction.getStatus().equals("Visa payment processing is down")
+                );
+*/
 
         //Update the status of the payment
         boolean isTransactionDeclined = transSet
                 .stream()
                 .anyMatch(
-                        transaction -> transaction.getStatus().contains("Declined")
+                        transaction -> transaction.getStatus().equals(com.sppxs.europa.payment.enums.Transaction.TransactionStatus.DECLINED)
                 );
-
-
-        /*boolean isTransactionErroredOnService = transSet
-                .stream()
-                .anyMatch(
-                        transaction -> transaction.getStatus().contains("Visa payment processing is down")
-                );*/
 
         boolean isTransactionSuccessful = transSet
                 .stream()
                 .allMatch(
-                        transaction -> transaction.getStatus().contains("Success")
+                        transaction -> transaction.getStatus().equals(com.sppxs.europa.payment.enums.Transaction.TransactionStatus.SUCCESS)
                 );
 
         if (isTransactionDeclined) {
-            payment.setStatus("Declined");
+            payment.setStatus(DECLINED);
         } else if (isTransactionSuccessful) {
-            payment.setStatus("Success");
+            payment.setStatus(SUCCESS);
         } else {
-            payment.setStatus("Pending");
+            payment.setStatus(PENDING);
         }
 
         payment.removeTransactions(oldTransSet);
@@ -136,8 +154,9 @@ public class PaymentService {
         return payment;
     }
 
-    private static PaymentRequest generatePaymentRequestBuilder(Transaction transaction, Payment newPaymentObjCopy) {
-        return new PaymentRequest(
+
+    private static TransactionRequest generatePaymentRequestBuilder(Transaction transaction, Payment newPaymentObjCopy) {
+        return new TransactionRequest(
                 newPaymentObjCopy.getPurchaseOrderId(),
                 transaction.getTransactionId());
         /*PaymentRequest.builder()

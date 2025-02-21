@@ -1,8 +1,8 @@
 package com.sppxs.europa.external.api;
 
 
-import com.sppxs.europa.payment.entity.dto.PaymentRequest;
-import com.sppxs.europa.payment.entity.dto.PaymentResponse;
+import com.sppxs.europa.payment.entity.dto.TransactionRequest;
+import com.sppxs.europa.payment.entity.dto.TransactionResponse;
 import com.sppxs.europa.payment.service.PaymentProcessorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,13 +21,13 @@ public class PaymentProcessorController {
     private PaymentProcessorService paymentProcessorService;
 
     @PostMapping
-    public List<PaymentResponse> processPayment(@RequestBody List<PaymentRequest> paymentRequests) throws ExecutionException, InterruptedException {
+    public List<TransactionResponse> processPayment(@RequestBody List<TransactionRequest> transactionRequests) throws ExecutionException, InterruptedException {
         try (ExecutorService executorService = Executors.newFixedThreadPool(10)) {
-            List<Future<PaymentResponse>> futures = new ArrayList<>();
+            List<Future<TransactionResponse>> futures = new ArrayList<>();
 
-            paymentRequests.forEach(paymentRequest ->
+            transactionRequests.forEach(transactionRequest ->
                     futures.add(executorService.submit(() ->
-                            paymentProcessorService.processPayment(paymentRequest)
+                            paymentProcessorService.processPayment(transactionRequest)
                     ))
             );
 
@@ -42,7 +42,7 @@ public class PaymentProcessorController {
 
             // By default, CompletableFuture.supplyAsync uses the common ForkJoinPool. If you intend to use the
             // custom executorService you declared, pass it as a second argument:
-            List<CompletableFuture<PaymentResponse>> completableFutures = futures.stream()
+            List<CompletableFuture<TransactionResponse>> completableFutures = futures.stream()
                     .map(future -> CompletableFuture.supplyAsync(() -> {
                         try {
                             return future.get();
@@ -55,7 +55,7 @@ public class PaymentProcessorController {
             CompletableFuture.allOf(
                     completableFutures.toArray(new CompletableFuture[0])).join();
 
-            List<PaymentResponse> responses = completableFutures.stream()
+            List<TransactionResponse> responses = completableFutures.stream()
                     .map(CompletableFuture::join)
                     .toList();
             return responses;
